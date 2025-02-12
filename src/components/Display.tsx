@@ -1,15 +1,22 @@
 import React from "react";
-import SunIcon from "./icons/SunIcon";
 import styles from "../styles/Display.module.scss";
+import weatherStore from "../store/weatherStore";
 
 const Display: React.FC = () => {
+  if (!weatherStore.weather) return <div>Loading...</div>;
+
+  const description = weatherStore.weather.weather[0].description;
+  const temperature = weatherStore.weather?.main.temp;
+
   return (
     <div className={styles.displayBlock}>
       <div className={styles.temperatureBlock}>
-        <SunIcon />
-        <span className={styles.temperature}>19</span>
+        <img src={weatherStore.weatherIcon} alt="Weather icon" />
+        <span className={styles.temperature}>{Math.round(temperature)}</span>
       </div>
-      <span className={styles.info}>Преимущественно солнечно</span>
+      <span className={styles.info}>
+        {description[0].toUpperCase() + description.slice(1)}
+      </span>
     </div>
   );
 };

@@ -1,10 +1,8 @@
-import apiConfig from "./apiConfig";
-
-const API_KEY = import.meta.env.VITE_API_KEY;
+import apiConfig, { API_KEY } from "./apiConfig";
 
 export const getWeather = async (city: string) => {
   const { data } = await apiConfig.get("/weather", {
-    params: { appid: API_KEY, q: city },
+    params: { appid: API_KEY, q: city, units: "metric", lang: "ru" },
   });
   return data;
 };
