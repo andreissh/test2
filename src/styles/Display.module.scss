@@ -1,0 +1,14 @@
+.displayBlock {
+  margin: 0 auto;
+}
+
+.temperatureBlock {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.temperature {
+  font-size: 11.25rem;
+  line-height: 11.25rem;
+}

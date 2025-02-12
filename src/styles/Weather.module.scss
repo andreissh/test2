@@ -1,0 +1,13 @@
+.wrapper {
+  min-height: 100vh;
+  display: flex;
+  padding: 4.75rem;
+  background-color: #498cec;
+}
+
+.innerWrapper {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  flex: 1;
+}
