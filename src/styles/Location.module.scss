@@ -68,3 +68,26 @@
   background-color: rgba(255, 255, 255, 0.2);
   opacity: 1;
 }
+
+.searchBlock {
+  position: relative;
+}
+
+.search {
+  width: 580px;
+  height: 100px;
+  padding: 2rem;
+  padding-right: 6rem;
+  border-radius: 12px;
+  font-size: 2rem;
+  background-color: #fff;
+}
+
+.searchBtn {
+  position: absolute;
+  top: 2.25rem;
+  right: 2rem;
+  font-size: 2rem;
+  line-height: 2rem;
+  color: #1086ff;
+}

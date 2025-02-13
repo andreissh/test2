@@ -1,9 +1,12 @@
 import apiConfig, { API_KEY } from "./apiConfig";
 
-export const getWeather = async (city: string) => {
+export const getWeather = async (
+  city: string,
+  units: "metric" | "imperial" = "metric"
+) => {
   try {
     const response = await apiConfig.get("/weather", {
-      params: { appid: API_KEY, q: city, units: "metric", lang: "ru" },
+      params: { appid: API_KEY, q: city, units, lang: "ru" },
     });
     return response.data;
   } catch (err) {

@@ -13,7 +13,7 @@ const Info: React.FC = () => {
         condition="Ветер"
         value={`${Math.round(
           weatherStore.weather.wind.speed
-        )} м/c, ${getWindDirection(weatherStore.weather.wind.deg)}`}
+        )} м/с, ${getWindDirection(weatherStore.weather.wind.deg)}`}
       />
       <WeatherConditions
         condition="Давление"
