@@ -12,7 +12,7 @@ const Display: React.FC = () => {
     <div className={styles.displayBlock}>
       <div className={styles.temperatureBlock}>
         <img src={weatherStore.weatherIcon} alt="Weather icon" />
-        <span className={styles.temperature}>{Math.round(temperature)}</span>
+        <span className={styles.temperature}>{Math.round(temperature)}°</span>
       </div>
       <span className={styles.info}>
         {description[0].toUpperCase() + description.slice(1)}
