@@ -3,7 +3,7 @@ import styles from "../styles/Location.module.scss";
 import weatherStore from "../store/weatherStore";
 
 const Location: React.FC = () => {
-  if (!weatherStore.weather) return <div>Loading...</div>;
+  if (!weatherStore.weather) return <></>;
 
   return (
     <div className={styles.wrapper}>

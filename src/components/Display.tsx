@@ -3,7 +3,7 @@ import styles from "../styles/Display.module.scss";
 import weatherStore from "../store/weatherStore";
 
 const Display: React.FC = () => {
-  if (!weatherStore.weather) return <div>Loading...</div>;
+  if (!weatherStore.weather) return <></>;
 
   const description = weatherStore.weather.weather[0].description;
   const temperature = weatherStore.weather?.main.temp;

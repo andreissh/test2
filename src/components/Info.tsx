@@ -5,7 +5,7 @@ import weatherStore from "../store/weatherStore";
 import getWindDirection from "../utils/utils";
 
 const Info: React.FC = () => {
-  if (!weatherStore.weather) return <div>Loading...</div>;
+  if (!weatherStore.weather) return <></>;
 
   return (
     <div className={styles.wrapper}>
