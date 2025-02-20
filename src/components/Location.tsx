@@ -1,72 +1,107 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import styles from "../styles/Location.module.scss";
 import weatherStore from "../store/weatherStore";
 import LocationIcon from "./icons/LocationIcon";
 import searchCityStore from "../store/searchCityStore";
 import { observer } from "mobx-react-lite";
-import { getWeather } from "../api/getWeather";
 import { toast } from "react-toastify";
-import { getCityByIP } from "../api/getPosition";
+import { reaction } from "mobx";
+import { UnitsType } from "../types/types";
+
+enum Units {
+  METRIC = "metric",
+  IMPERIAL = "imperial",
+}
 
 const Location: React.FC = observer(() => {
-  const [units, setUnits] = useState<"metric" | "imperial">(
-    () => (localStorage.getItem("units") as "metric" | "imperial") || "metric"
-  );
   const [searchText, setSearchText] = useState<string>("");
+  const searchBlockRef = useRef<HTMLDivElement | null>(null);
 
-  useEffect(() => {
+  const toggleUnits = async (units: UnitsType) => {
     localStorage.setItem("units", units);
-  }, [units]);
-
-  const toggleUnits = async (unit: "metric" | "imperial") => {
-    setUnits(unit);
-    const weather = await getWeather(weatherStore.city, unit);
-    if (!weather) {
-      console.error("Не удалось получить данные о погоде");
-      return;
-    }
-    weatherStore.setWeather(weather);
+    weatherStore.setUnits(units);
+    weatherStore.fetchWeatherData(weatherStore.city);
   };
 
-  const handleChangeCityClick = (status: boolean) => {
-    searchCityStore.toggleCityChange(status);
+  const handleChangeCityClick = () => {
+    searchCityStore.toggleCityChange(true);
   };
 
-  const handleChangeCityInputClick = async (status: boolean) => {
-    searchCityStore.toggleCityChange(status);
+  const handleFetchWeatherByCity = async () => {
+    searchCityStore.toggleCityChange(false);
 
     if (!searchText) return;
 
-    const weather = await getWeather(searchText, units);
-    if (!weather) {
+    const data = await weatherStore.fetchWeatherData(searchText);
+    if (data && data.error) {
       console.error("Не удалось получить данные о погоде");
       toast.error("Город не найден. Проверьте правильность ввода.", {
         position: "bottom-right",
         style: { width: "500px" },
       });
+      weatherStore.setCity(weatherStore.prevCity);
       return;
     }
-    weatherStore.setCity(searchText);
-    weatherStore.setWeather(weather);
   };
 
   const handleMyLocation = async () => {
-    const city = await getCityByIP();
-    weatherStore.setCity(city);
-    const weather = await getWeather(weatherStore.city, units);
-    weatherStore.setWeather(weather);
+    weatherStore.fetchWeatherData();
   };
 
   const handleSearchTextChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchText(e.target.value);
   };
 
-  if (!weatherStore.weather) return <></>;
+  const handleClickOutside = (event: MouseEvent) => {
+    if (
+      searchBlockRef.current &&
+      !searchBlockRef.current.contains(event.target as Node)
+    ) {
+      searchCityStore.toggleCityChange(false);
+    }
+  };
+
+  const handleEscapePress = (event: KeyboardEvent) => {
+    if (event.key === "Escape") {
+      searchCityStore.toggleCityChange(false);
+    }
+  };
+
+  useEffect(() => {
+    const disposer = reaction(
+      () => searchCityStore.isCityChangeActive,
+      (isActive) => {
+        if (isActive) {
+          document.addEventListener("mousedown", handleClickOutside);
+          document.addEventListener("keydown", handleEscapePress);
+
+          requestAnimationFrame(() => {
+            if (searchBlockRef.current) {
+              const input = searchBlockRef.current.querySelector("input");
+              if (input) input.focus();
+            }
+          });
+        } else {
+          document.removeEventListener("mousedown", handleClickOutside);
+          document.removeEventListener("keydown", handleEscapePress);
+        }
+      },
+      { fireImmediately: true }
+    );
+
+    return () => {
+      disposer();
+      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("keydown", handleEscapePress);
+    };
+  }, []);
+
+  if (!weatherStore.weather) return null;
 
   return (
-    <div className={`${styles.wrapper}`}>
+    <div className={styles.wrapper}>
       {searchCityStore.isCityChangeActive ? (
-        <div className={styles.searchBlock}>
+        <div className={styles.searchBlock} ref={searchBlockRef}>
           <input
             className={styles.search}
             type="text"
@@ -76,7 +111,7 @@ const Location: React.FC = observer(() => {
           />
           <button
             className={styles.searchBtn}
-            onClick={() => handleChangeCityInputClick(false)}
+            onClick={handleFetchWeatherByCity}
           >
             ОК
           </button>
@@ -87,7 +122,7 @@ const Location: React.FC = observer(() => {
           <div className={styles.locationWrapper}>
             <button
               className={styles.changeCity}
-              onClick={() => handleChangeCityClick(true)}
+              onClick={handleChangeCityClick}
             >
               Сменить город
             </button>
@@ -106,17 +141,17 @@ const Location: React.FC = observer(() => {
         <span>°</span>
         <button
           className={`${styles.celsius} ${
-            units === "metric" ? styles.active : ""
+            weatherStore.units === Units.METRIC ? styles.active : ""
           }`}
-          onClick={() => toggleUnits("metric")}
+          onClick={() => toggleUnits(Units.METRIC)}
         >
           C
         </button>
         <button
           className={`${styles.fahrenheit} ${
-            units === "imperial" ? styles.active : ""
+            weatherStore.units === Units.IMPERIAL ? styles.active : ""
           }`}
-          onClick={() => toggleUnits("imperial")}
+          onClick={() => toggleUnits(Units.IMPERIAL)}
         >
           F
         </button>

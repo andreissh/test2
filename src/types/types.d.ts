@@ -14,3 +14,5 @@ export type WeatherDataType = {
   name: string;
   pop: number;
 };
+
+export type UnitsType = "metric" | "imperial";

@@ -1,12 +1,15 @@
+import weatherStore from "../store/weatherStore";
 import apiConfig, { API_KEY } from "./apiConfig";
 
-export const getWeather = async (
-  city: string,
-  units: "metric" | "imperial" = "metric"
-) => {
+export const getWeather = async (city: string) => {
   try {
     const response = await apiConfig.get("/weather", {
-      params: { appid: API_KEY, q: city, units, lang: "ru" },
+      params: {
+        appid: API_KEY,
+        q: city,
+        units: weatherStore.units,
+        lang: "ru",
+      },
     });
     return response.data;
   } catch (err) {

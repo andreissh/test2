@@ -7,12 +7,8 @@ class SearchCityStore {
     makeAutoObservable(this);
   }
 
-  setChangeCity(isCityChangeActive: boolean) {
+  toggleCityChange(isCityChangeActive: boolean) {
     this.isCityChangeActive = isCityChangeActive;
-  }
-
-  toggleCityChange(status: boolean) {
-    this.setChangeCity(status);
   }
 }
 

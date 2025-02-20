@@ -1,12 +1,14 @@
 import { makeAutoObservable } from "mobx";
 import { getWeather } from "../api/getWeather";
+import { UnitsType, WeatherDataType } from "../types/types";
 import { getCityByIP } from "../api/getPosition";
-import { WeatherDataType } from "../types/types";
 
 class WeatherStore {
   city: string = "";
+  prevCity: string = "";
   weather: WeatherDataType | null = null;
   weatherIcon: string = "";
+  units: UnitsType = (localStorage.getItem("units") as UnitsType) ?? "metric";
   loading: boolean = false;
   error: string | null = null;
 
@@ -18,12 +20,20 @@ class WeatherStore {
     this.city = city;
   }
 
+  setPrevCity(prevCity: string) {
+    this.prevCity = prevCity;
+  }
+
   setWeather(weather: WeatherDataType | null) {
     this.weather = weather;
   }
 
   setWeatherIcon(weatherIcon: string) {
     this.weatherIcon = weatherIcon;
+  }
+
+  setUnits(units: UnitsType) {
+    this.units = units;
   }
 
   setLoading(loading: boolean) {
@@ -34,25 +44,31 @@ class WeatherStore {
     this.error = error;
   }
 
-  async fetchWeatherData() {
+  async fetchWeatherData(currentCity?: string) {
     this.setLoading(true);
     this.setError(null);
 
     try {
-      const city = await getCityByIP();
-      if (!city) {
-        console.error("Не удалось получить город");
-        return;
+      if (currentCity) {
+        this.setPrevCity(this.city);
+        this.setCity(currentCity);
+      } else {
+        const city = await getCityByIP();
+        if (!city) {
+          console.error("Не удалось получить город");
+          return;
+        }
+        this.setCity(city);
       }
-      this.setCity(city);
-      const weather = await getWeather(city);
+      const weather = await getWeather(currentCity ? currentCity : this.city);
       if (!weather) {
         console.error("Не удалось получить данные о погоде");
-        return;
+        return { error: true, message: "Не удалось получить данные о погоде" };
       }
       this.setWeather(weather);
-      const weatherIcon = weather.weather?.[0]?.icon
-        ? `https://openweathermap.org/img/wn/${weather.weather[0].icon}@4x.png`
+      const { icon: iconId } = weather.weather[0];
+      const weatherIcon = iconId
+        ? `https://openweathermap.org/img/wn/${iconId}@4x.png`
         : "";
       this.setWeatherIcon(weatherIcon);
     } catch (error) {

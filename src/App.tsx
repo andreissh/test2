@@ -10,7 +10,6 @@ import "./App.css";
 const App = observer(() => {
   useEffect(() => {
     weatherStore.fetchWeatherData();
-    localStorage.setItem("units", "metric");
   }, []);
 
   if (weatherStore.loading)
