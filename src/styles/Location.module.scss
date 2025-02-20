@@ -3,22 +3,22 @@
   justify-content: space-between;
 }
 
-.locationWrapper {
+.location-wrapper {
   display: flex;
   gap: 1.5rem;
 }
 
-.changeCity,
+.change-city,
 .location {
   opacity: 0.6;
 }
 
-.locationBlock {
+.location-block {
   position: relative;
   display: flex;
 }
 
-.locationBlock span {
+.location-block span {
   position: absolute;
   top: 0;
   left: 0;
@@ -69,7 +69,7 @@
   opacity: 1;
 }
 
-.searchBlock {
+.search-block {
   position: relative;
 }
 
